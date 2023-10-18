@@ -46,10 +46,10 @@ public class TrackingService {
         Hits hits = hitsRepository.findByUrl(url);
 
         if (hits == null) {
-            new IllegalArgumentException("");
-        } else  {
-            hits.updateHits(hits.getDailyHits(), hits.getTotalHits());
+            saveUrl(url);
         }
+
+        hits.updateHits(hits.getDailyHits(), hits.getTotalHits());
     }
 
     /**
