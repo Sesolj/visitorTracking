@@ -24,7 +24,7 @@ public class TrackingApiController {
 
     // Q 컨트롤러에서 스케줄 기능 수행해도 될까?
     // 스케줄링
-    @Scheduled(cron = "0 22 2 * * ?") // 매일 정각에 조회수 초기화
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 정각에 조회수 초기화
     public void finishDailyHits() throws Exception {
         System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>조회수를 초기화합니다.");
 
@@ -35,7 +35,8 @@ public class TrackingApiController {
         trackingService.resetDailyHits();
     }
 
-    // Q 예외 처리
+    // [TODO] API Response 구체화
+    // [TODO] API 에러 반환 처리
     @Operation(summary = "url 정보 등록", description = "DB에 url 정보 등록하는 API")
     @PostMapping("/api/tracking")
     public String save(String url) {

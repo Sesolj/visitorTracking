@@ -17,7 +17,6 @@ import java.util.List;
 @Service
 public class TrackingService {
 
-    // Q private final 필요한 이유
     private final HitsRepository hitsRepository;
     private final LogsRepository logsRepository;
 
@@ -34,7 +33,7 @@ public class TrackingService {
                     .url(url)
                     .build());
         } else {
-            // 이미 등록된 url입니다.
+            new Exception("이미 등록된 url 입니다.");
         }
     }
 
@@ -59,7 +58,6 @@ public class TrackingService {
      **/
     @Transactional
     public void resetDailyHits() {
-        // 모든 daily_hits column 0으로 초기화
         hitsRepository.resetAllDailyHits();
     }
 
@@ -72,7 +70,7 @@ public class TrackingService {
         List<Hits> hitsList = hitsRepository.findAll();
         LocalDateTime realDate = LocalDateTime.now().minusDays(1);
 
-        // Q 성능 문제
+        // [TODO] 성능 문제 없는지 확인 필요, 대용량 데이터 테스트
         for (Hits h : hitsList) {
             // 날짜별로 정렬 후 데이터 가져오기
             List<Logs> logsList = logsRepository.findByHitsOrderByDateAsc(h);
