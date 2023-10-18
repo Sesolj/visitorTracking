@@ -21,7 +21,7 @@ public class Logs {
     @Column(name = "date_hits")
     private int dateHits;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="url_id")
     private Hits hits;
 
