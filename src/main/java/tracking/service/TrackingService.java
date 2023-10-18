@@ -6,8 +6,11 @@ import tracking.domain.Hits;
 import tracking.domain.HitsRepository;
 import tracking.domain.Logs;
 import tracking.domain.LogsRepository;
+import tracking.web.dto.HitsResponseDto;
+import tracking.web.dto.LogsResponseDto;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -19,7 +22,7 @@ public class TrackingService {
     private final LogsRepository logsRepository;
 
     /**
-     * @methodName : saveUrl
+     * @methodName: saveUrl
      * @Description: url 정보 저장
      **/
     @Transactional
@@ -36,7 +39,7 @@ public class TrackingService {
     }
 
     /**
-     * @methodName : addHits
+     * @methodName: addHits
      * @Description: 일일 조회수, 전체 조회수 증가
      **/
     @Transactional
@@ -51,7 +54,7 @@ public class TrackingService {
     }
 
     /**
-     * @methodName : resetDailyHits
+     * @methodName: resetDailyHits
      * @Description: 일일 조회수 초기화
      **/
     @Transactional
@@ -60,22 +63,69 @@ public class TrackingService {
         hitsRepository.resetAllDailyHits();
     }
 
+    /**
+     * @methodName: saveDateHits
+     * @Description: 일일 조회수를 날짜와 함께 저장
+     **/
+    @Transactional
     public void saveDateHits() {
-        // 일자 별 조회수 저장
-        // 가장 오래된 레코드가 7일 이상 전이면 삭제 후 해당 데이터 삽입
+        List<Hits> hitsList = hitsRepository.findAll();
+        LocalDateTime realDate = LocalDateTime.now().minusDays(1);
+
+        // Q 성능 문제
+        for (Hits h : hitsList) {
+            // 날짜별로 정렬 후 데이터 가져오기
+            List<Logs> logsList = logsRepository.findByHitsOrderByDateAsc(h);
+
+            if (!logsList.isEmpty()) {
+                Logs oldest = logsList.get(0);
+                LocalDateTime dateLimit = LocalDateTime.now().minusDays(7);
+
+                // 가장 오래된 레코드 날짜가 7일 이상일 경우 update
+                if (oldest.getDate().isBefore(dateLimit)) {
+                    oldest.update(realDate, h.getDailyHits());
+                    break;
+                }
+            }
+
+            logsRepository.save(Logs.builder()
+                    .hits(h)
+                    .dateHits(h.getDailyHits())
+                    .date(realDate)
+                    .build());
+        }
     }
 
-    public void showDailyHits() {
-        // 일간 조회수 반환
+    /**
+     * @methodName: showHits
+     * @Description: 조회수 정보 반환
+     **/
+    public HitsResponseDto showHits(String url) {
+        Hits hits = hitsRepository.findByUrl(url);
+
+        HitsResponseDto hitsResponseDto = new HitsResponseDto();
+        hitsResponseDto.dailyHits = hits.getDailyHits();
+        hitsResponseDto.totalHits = hits.getTotalHits();
+
+        return hitsResponseDto;
     }
 
-    public void showTotalHits() {
-        // 전체 조회수 반환
-    }
+    /**
+     * @methodName: showStatistics
+     * @Description: N일 간의 누적 Hits 정보 반환
+     * @param minDate: 조회하고자 하는 기간의 최소 일자
+     * @param maxDate: 조회하고자 하는 기간의 최대 일자
+     **/
+    // 예외 처리: 설정한 날짜 범위의 데이터가 없을 경우 고려
+    public LogsResponseDto showStatistics(String url, LocalDateTime minDate, LocalDateTime maxDate) {
+        LogsResponseDto logsResponseDto = new LogsResponseDto();
 
-    // @param: minDate, maxDate
-    public void showStatistics() {
-        // N일 간의 누적 조회수 반환
-        // 예외 처리: 설정한 날짜 범위의 데이터가 없을 경우 고려
+        // 양방향 매핑하면 불필요한 과정일듯
+        Hits hits = hitsRepository.findByUrl(url);
+        List<Logs> logsList = logsRepository.findByHitsOrderByDateAsc(hits);
+
+
+
+        return logsResponseDto;
     }
 }

@@ -18,18 +18,47 @@ public class HitsRepositoryTest {
     @Autowired
     HitsRepository hitsRepository;
 
+    @Test
+    @DisplayName("방문자 수 정보 저장하고 불러오는 테스트")
+    public void getHitsTest() {
+        // given
+        String url = "http://test.com";
+        int dailyHits = 5;
+        int totalHits = 10;
+
+        hitsRepository.save(Hits.builder()
+                .url(url)
+                .dailyHits(dailyHits)
+                .totalHits(totalHits)
+                .build());
+
+        // when
+        Hits hits = hitsRepository.findByUrl(url);
+
+        // then
+        System.out.println(">>>>>>>>>>>> getHitsTest");
+        assertThat(hits.getUrl()).isEqualTo(url);
+        assertThat(hits.getDailyHits()).isEqualTo(dailyHits);
+        assertThat(hits.getTotalHits()).isEqualTo(totalHits);
     }
 
     @Test
-    public void getHits() {
+    @DisplayName("hits 증가 테스트")
+    public void addHitsTest() {
+        // given
         String url = "http://test.com";
+        int expectedDailyHits = 1;
+        int expectedTotalHits = 1;
 
         hitsRepository.save(Hits.builder().url(url).build());
 
-        List<Hits> hitsList = hitsRepository.findAll();
+        // when
+        Hits hits = hitsRepository.findByUrl(url);
+        hits.updateHits(hits.getDailyHits(), hits.getTotalHits());
 
-        Hits hits = hitsList.get(0);
-        System.out.println(hits.getUrl());
-        assertThat(hits.getUrl()).isEqualTo(url);
+        // then
+        System.out.println(">>>>>>>>>>>> addHitsTest");
+        assertThat(hits.getDailyHits()).isEqualTo(expectedDailyHits);
+        assertThat(hits.getTotalHits()).isEqualTo(expectedTotalHits);
     }
 }

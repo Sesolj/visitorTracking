@@ -34,6 +34,10 @@ public class Hits {
         this.totalHits = totalHits;
     }
 
+    /**
+     * @methodName : updateHits
+     * @Description: 매개변수로 받은 hits에 + 1
+     **/
     public void updateHits(int dailyHits, int totalHits) {
         this.dailyHits = dailyHits + 1;
         this.totalHits = totalHits + 1;

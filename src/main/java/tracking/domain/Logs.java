@@ -26,7 +26,13 @@ public class Logs {
     private Hits hits;
 
     @Builder
-    public Logs(LocalDateTime date, int dateHits) {
+    public Logs(LocalDateTime date, int dateHits, Hits hits) {
+        this.date = date;
+        this.dateHits = dateHits;
+        this.hits = hits;
+    }
+
+    public void update(LocalDateTime date, int dateHits) {
         this.date = date;
         this.dateHits = dateHits;
     }
