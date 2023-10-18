@@ -114,15 +114,23 @@ public class TrackingService {
      * @param minDate: 조회하고자 하는 기간의 최소 일자
      * @param maxDate: 조회하고자 하는 기간의 최대 일자
      **/
-    // 예외 처리: 설정한 날짜 범위의 데이터가 없을 경우 고려
+    // [TODO] 예외 처리: 설정한 날짜 범위가 논리적인지 확인
     public LogsResponseDto showStatistics(String url, LocalDateTime minDate, LocalDateTime maxDate) {
         LogsResponseDto logsResponseDto = new LogsResponseDto();
 
-        // 양방향 매핑하면 불필요한 과정일듯
+        // [TODO] 리팩토링 필요
         Hits hits = hitsRepository.findByUrl(url);
         List<Logs> logsList = logsRepository.findByHitsOrderByDateAsc(hits);
-
-
+        if (logsList.size() > 0) {
+            for (Logs l:
+                 logsList) {
+                if(l.getDate().compareTo(minDate) > 0 && l.getDate().compareTo(maxDate) < 0)
+                    logsResponseDto.customDaysHits+=l.getDateHits();
+            }
+        }
+        else {
+            logsResponseDto.customDaysHits = hits.getTotalHits();
+        }
 
         return logsResponseDto;
     }
