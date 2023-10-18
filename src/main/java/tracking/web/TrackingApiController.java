@@ -1,6 +1,7 @@
 package tracking.web;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,27 +36,27 @@ public class TrackingApiController {
     }
 
     // Q 예외 처리
-    // DB에 url 정보 등록하는 API
+    @Operation(summary = "url 정보 등록", description = "DB에 url 정보 등록하는 API")
     @PostMapping("/api/tracking")
     public String save(String url) {
         trackingService.saveUrl(url);
         return "OK";
     }
 
-    // url의 카운트를 증가하는 API
+    @Operation(summary = "url 카운트 증가", description = "url의 카운트를 증가하는 API")
     @PutMapping("/api/tracking/{url}")
     public String update(String url) {
         trackingService.addHits(url);
         return  "OK";
     }
 
-    // 일간 조회수와 누적 조회수를 응답하는 API
+    @Operation(summary = "일간/누적 hits 조회", description = "일간 조회수와 누적 조회수를 응답하는 API")
     @GetMapping("/api/tracking/get-hits/{url}")
     public HitsResponseDto getHits(String url) {
         return trackingService.showHits(url);
     }
 
-    // N일 간의 조회수 통계 데이터를 응답하는 API(기본값: 7, 최대값: 7)
+    @Operation(summary = "N일 간의 hits 조회", description = "N일 간의 조회수 통계 데이터를 응답하는 API(최대 일수: 7)")
     @GetMapping("/api/tracking/get-hits-statistic/{url}")
     public LogsResponseDto getHits(String url, LocalDateTime minDate, LocalDateTime maxDate) {
         return trackingService.showStatistics(url, minDate, maxDate);

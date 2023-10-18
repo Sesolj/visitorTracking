@@ -65,7 +65,7 @@ public class TrackingService {
 
     /**
      * @methodName: saveDateHits
-     * @Description: 일일 조회수를 날짜와 함께 저장
+     * @Description: 모든 hits 컬럼의 일일 조회수를 날짜와 함께 logs 테이블에 저장
      **/
     @Transactional
     public void saveDateHits() {

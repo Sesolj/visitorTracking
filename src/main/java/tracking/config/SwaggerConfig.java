@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
-    private static final String API_NAME = "Swagger 테스트";
-    private static final String API_DESCRIPTION = "Swagger 테스트입니다";
+    private static final String API_NAME = "방문자 수 트래킹 서비스";
+    private static final String API_DESCRIPTION = "방문자 수 트래킹 서비스 API Docs";
 
     @Bean
     public OpenAPI openAPI() {
