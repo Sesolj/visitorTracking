@@ -4,10 +4,7 @@ package tracking.web;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import tracking.domain.Hits;
 import tracking.service.TrackingService;
 import tracking.web.dto.HitsResponseDto;
@@ -38,28 +35,28 @@ public class TrackingApiController {
     // [TODO] API Response 구체화
     // [TODO] API 에러 반환 처리
     @Operation(summary = "url 정보 등록", description = "DB에 url 정보 등록하는 API")
-    @PostMapping("/api/tracking")
-    public String save(String url) {
+    @PostMapping("/api/tracking/users/{url}")
+    public String save(@RequestParam String url) {
         trackingService.saveUrl(url);
         return "OK";
     }
 
     @Operation(summary = "url 카운트 증가", description = "url의 카운트를 증가하는 API")
-    @PutMapping("/api/tracking/{url}")
-    public String update(String url) {
+    @PutMapping("/api/tracking/hits/{url}")
+    public String update(@RequestParam String url) {
         trackingService.addHits(url);
         return  "OK";
     }
 
     @Operation(summary = "일간/누적 hits 조회", description = "일간 조회수와 누적 조회수를 응답하는 API")
-    @GetMapping("/api/tracking/get-hits/{url}")
-    public HitsResponseDto getHits(String url) {
+    @GetMapping("/api/tracking/hits-management/{url}")
+    public HitsResponseDto getHits(@RequestParam String url) {
         return trackingService.showHits(url);
     }
 
     @Operation(summary = "N일 간의 hits 조회", description = "N일 간의 조회수 통계 데이터를 응답하는 API(최대 일수: 7)")
-    @GetMapping("/api/tracking/get-hits-statistic/{url}")
-    public LogsResponseDto getHits(String url, LocalDateTime minDate, LocalDateTime maxDate) {
+    @Operation(summary = "N일 간의 hits 조회", description = "N일 간의 조회수 데이터를 응답하는 API(최대 일수: 7)")
+    @GetMapping("/api/tracking/hits-management/statistics/{url}")
         return trackingService.showStatistics(url, minDate, maxDate);
     }
 }
