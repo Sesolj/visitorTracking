@@ -22,21 +22,19 @@ public class LogsRepositoryTest {
     @Autowired
     LogsRepository logsRepository;
 
-    @After
-    public void cleanup() {
-        logsRepository.deleteAll();
-    }
-
     @Test
-    @DisplayName("logs 데이터 저장하고 불러오는 테스트")
-    public void getLogs() {
+    @DisplayName("logs 데이터 불러오는 테스트")
+    public void getLogsTest() {
+        // given
         LocalDateTime date = LocalDateTime.now();
         String dateFormat = date.format(DateTimeFormatter.ISO_DATE);
 
         logsRepository.save(Logs.builder().date(date).build());
 
-        List<Logs> logsList = logsRepository.findAll();
+        // when
+        List<Logs> logsList = logsRepository.findAllByOrderByDateDesc();
 
+        // then
         Logs logs = logsList.get(0);
         System.out.println("//////////////test////" + logs.getDate().format(DateTimeFormatter.ISO_DATE));
 

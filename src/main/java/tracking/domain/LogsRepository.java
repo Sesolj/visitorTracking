@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface LogsRepository extends JpaRepository<Logs, Long> {
     List<Logs> findByHitsOrderByDateAsc(Hits hits);
+    List<Logs> findAllByOrderByDateDesc();
 
     // [TODO] 에러 원인 확인, 로우 쿼리외의 적합한 조회 방식 고민 필요
 //    @Query(value = "SELECT sum(dateHits) FROM Logs l " +
