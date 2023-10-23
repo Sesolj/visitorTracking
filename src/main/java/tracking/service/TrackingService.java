@@ -48,6 +48,7 @@ public class TrackingService {
 
         if (hits == null) {
             saveUrl(url);
+            hits = hitsRepository.findByUrl(url);
         }
 
         hits.updateHits(hits.getDailyHits(), hits.getTotalHits());
