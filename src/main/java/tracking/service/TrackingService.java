@@ -7,6 +7,7 @@ import tracking.domain.HitsRepository;
 import tracking.domain.Logs;
 import tracking.domain.LogsRepository;
 import tracking.web.dto.HitsResponseDto;
+import tracking.web.dto.LogsRequestDto;
 import tracking.web.dto.LogsResponseDto;
 
 import javax.transaction.Transactional;
@@ -102,35 +103,38 @@ public class TrackingService {
         Hits hits = hitsRepository.findByUrl(url);
 
         HitsResponseDto hitsResponseDto = new HitsResponseDto();
-        hitsResponseDto.dailyHits = hits.getDailyHits();
-        hitsResponseDto.totalHits = hits.getTotalHits();
+        hitsResponseDto.setDailyHits(hits.getDailyHits());
+        hitsResponseDto.setTotalHits(hits.getTotalHits());
 
         return hitsResponseDto;
     }
 
     /**
      * @methodName: showStatistics
-     * @Description: N일 간의 누적 Hits 정보 반환
-     * @param minDate: 조회하고자 하는 기간의 최소 일자
-     * @param maxDate: 조회하고자 하는 기간의 최대 일자
+     * @Description: N일 간의 누적 방문자 수 정보 반환
+     * @param logsRequestDto: url, 최소 일자, 최대 일자
      **/
     // [TODO] 예외 처리: 설정한 날짜 범위가 논리적인지 확인
-    public LogsResponseDto showStatistics(String url, LocalDateTime minDate, LocalDateTime maxDate) {
+    public LogsResponseDto showStatistics(LogsRequestDto logsRequestDto) {
         LogsResponseDto logsResponseDto = new LogsResponseDto();
+        int customDaysHits = logsResponseDto.getCustomDaysHits();
 
         // [TODO] 리팩토링 필요
-        Hits hits = hitsRepository.findByUrl(url);
+        Hits hits = hitsRepository.findByUrl(logsRequestDto.getUrl());
         List<Logs> logsList = logsRepository.findByHitsOrderByDateAsc(hits);
         if (logsList.size() > 0) {
             for (Logs l:
                  logsList) {
-                if(l.getDate().compareTo(minDate) > 0 && l.getDate().compareTo(maxDate) < 0)
-                    logsResponseDto.customDaysHits+=l.getDateHits();
+                if(l.getDate().compareTo(logsRequestDto.getMinDate()) > 0
+                        && l.getDate().compareTo(logsRequestDto.getMaxDate()) < 0)
+                    customDaysHits+=l.getDateHits();
             }
         }
         else {
-            logsResponseDto.customDaysHits = hits.getTotalHits();
+            customDaysHits = hits.getTotalHits();
         }
+
+        logsResponseDto.setCustomDaysHits(customDaysHits);
 
         return logsResponseDto;
     }
