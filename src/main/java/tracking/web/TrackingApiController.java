@@ -56,8 +56,8 @@ public class TrackingApiController {
     }
 
     @Operation(summary = "N일 간의 방문자 수 조회", description = "N일 간의 방문자 수 데이터를 응답하는 API(최대 일수: 7)")
-    @GetMapping("/api/tracking/hits-management/statistics/{url}")
-    public ResponseEntity<LogsResponseDto> getLogs(@RequestParam LogsRequestDto logsRequestDto) {
+    @GetMapping("/api/tracking/hits-management/statistics")
+    public ResponseEntity<LogsResponseDto> getLogs(@ModelAttribute LogsRequestDto logsRequestDto) {
         return new ResponseEntity<>(trackingService.showStatistics(logsRequestDto), HttpStatus.OK);
     }
 }
