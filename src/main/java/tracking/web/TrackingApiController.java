@@ -37,21 +37,21 @@ public class TrackingApiController {
     // [TODO] API 에러 반환 처리
     @Operation(summary = "url 정보 등록", description = "DB에 url 정보 등록하는 API")
     @PostMapping("/api/tracking/users/{url}")
-    public ResponseEntity<String> save(@RequestParam String url) {
+    public ResponseEntity<String> save(@PathVariable("url") String url) {
         trackingService.saveUrl(url);
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
 
     @Operation(summary = "url 카운트 증가", description = "url의 카운트를 증가하는 API")
     @PutMapping("/api/tracking/hits/{url}")
-    public ResponseEntity<String> update(@RequestParam String url) {
+    public ResponseEntity<String> update(@PathVariable("url") String url) {
         trackingService.addHits(url);
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
 
     @Operation(summary = "일간/누적 방문자 수 조회", description = "일간 방문자 수와 누적 방문자 수를 응답하는 API")
     @GetMapping("/api/tracking/hits-management/{url}")
-    public ResponseEntity<HitsResponseDto> getHits(@RequestParam String url) {
+    public ResponseEntity<HitsResponseDto> getHits(@PathVariable("url") String url) {
         return new ResponseEntity<>(trackingService.showHits(url), HttpStatus.OK);
     }
 
