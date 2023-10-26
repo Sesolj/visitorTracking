@@ -3,7 +3,6 @@ package tracking.web;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,8 +21,11 @@ public class TrackingApiController {
 
     private final TrackingService trackingService;
 
-    // 스케줄링
-    @Scheduled(cron = "0 0 0 * * ?") // 매일 정각에 방문자 수 초기화
+    /**
+     * @methodName: finishDailyHits
+     * @Description: 매일 자정에 작동하는 스케줄링 코드. 일일 방문자 수 저장 및 초기화 수행
+     **/
+    @Scheduled(cron = "0 0 0 * * ?")
     public void finishDailyHits() throws Exception {
 
         // 날짜와 해당 일자 방문자 수를 로깅 테이블에 저장
@@ -33,8 +35,6 @@ public class TrackingApiController {
         trackingService.resetDailyHits();
     }
 
-    // [TODO] API Response 구체화
-    // [TODO] API 에러 반환 처리
     @Operation(summary = "url 정보 등록", description = "DB에 url 정보 등록하는 API")
     @PostMapping("/api/tracking/users/{url}")
     public ResponseEntity<String> save(@PathVariable("url") String url) {
@@ -58,6 +58,9 @@ public class TrackingApiController {
     @Operation(summary = "N일 간의 방문자 수 조회", description = "N일 간의 방문자 수 데이터를 응답하는 API(최대 일수: 7)")
     @GetMapping("/api/tracking/hits-management/statistics")
     public ResponseEntity<LogsResponseDto> getLogs(@ModelAttribute LogsRequestDto logsRequestDto) {
+        if (logsRequestDto.getMinDate().isBefore(LocalDateTime.now().minusDays(7)))
+            new Exception("7일 이상의 데이터는 조회할 수 없습니다.");
+
         return new ResponseEntity<>(trackingService.showStatistics(logsRequestDto), HttpStatus.OK);
     }
 }

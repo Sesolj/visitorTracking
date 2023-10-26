@@ -40,7 +40,7 @@ public class TrackingService {
 
     /**
      * @methodName: addHits
-     * @Description: 일일 조회수, 전체 조회수 증가
+     * @Description: 일일 방문자 수, 전체 방문자 수 증가. url 정보가 없을 경우 새로 저장 후 방문자 수 증가시킴
      **/
     @Transactional
     public void addHits(String url) {
@@ -56,7 +56,7 @@ public class TrackingService {
 
     /**
      * @methodName: resetDailyHits
-     * @Description: 일일 조회수 초기화
+     * @Description: 일일 방문자 수 초기화
      **/
     @Transactional
     public void resetDailyHits() {
@@ -65,7 +65,7 @@ public class TrackingService {
 
     /**
      * @methodName: saveDateHits
-     * @Description: 모든 hits 컬럼의 일일 조회수를 날짜와 함께 logs 테이블에 저장
+     * @Description: 모든 hits 레코드의 일일 방문자 수를 날짜와 함께 logs 테이블에 저장
      **/
     @Transactional
     public void saveDateHits() {
@@ -98,7 +98,7 @@ public class TrackingService {
 
     /**
      * @methodName: showHits
-     * @Description: 조회수 정보 반환
+     * @Description: 방문자 수 정보 반환
      **/
     public HitsResponseDto showHits(String url) {
         Hits hits = hitsRepository.findByUrl(url);
@@ -115,23 +115,23 @@ public class TrackingService {
      * @Description: N일 간의 누적 방문자 수 정보 반환
      * @param logsRequestDto: url, 최소 일자, 최대 일자
      **/
-    // [TODO] 예외 처리: 설정한 날짜 범위가 논리적인지 확인
     public LogsResponseDto showStatistics(LogsRequestDto logsRequestDto) {
         LogsResponseDto logsResponseDto = new LogsResponseDto();
-        int customDaysHits = logsResponseDto.getCustomDaysHits();
+        int customDaysHits = 0;
 
-        // [TODO] 리팩토링 필요
         Hits hits = hitsRepository.findByUrl(logsRequestDto.getUrl());
         List<Logs> logsList = logsRepository.findByHitsOrderByDateAsc(hits);
         if (logsList.size() > 0) {
             for (Logs l:
                  logsList) {
+                // 설정 날짜 범위에 포함되는 데이터만 연산
                 if(l.getDate().compareTo(logsRequestDto.getMinDate()) > 0
                         && l.getDate().compareTo(logsRequestDto.getMaxDate()) < 0)
                     customDaysHits+=l.getDateHits();
             }
         }
         else {
+            // 저장된 로그 데이터가 없는 경우(트래킹 시작 후 하루가 지나지 않음), 전체 방문자 수 반환
             customDaysHits = hits.getTotalHits();
         }
 
