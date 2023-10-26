@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
+import tracking.exception.ApiException;
+import tracking.exception.ExceptionEnum;
 import tracking.service.TrackingService;
 import tracking.web.dto.HitsResponseDto;
 import tracking.web.dto.LogsRequestDto;
@@ -59,7 +61,7 @@ public class TrackingApiController {
     @GetMapping("/api/tracking/hits-management/statistics")
     public ResponseEntity<LogsResponseDto> getLogs(@ModelAttribute LogsRequestDto logsRequestDto) {
         if (logsRequestDto.getMinDate().isBefore(LocalDateTime.now().minusDays(7)))
-            new Exception("7일 이상의 데이터는 조회할 수 없습니다.");
+            throw new ApiException(ExceptionEnum.INVALID_DATE);
 
         return new ResponseEntity<>(trackingService.showStatistics(logsRequestDto), HttpStatus.OK);
     }

@@ -6,6 +6,8 @@ import tracking.domain.Hits;
 import tracking.domain.HitsRepository;
 import tracking.domain.Logs;
 import tracking.domain.LogsRepository;
+import tracking.exception.ApiException;
+import tracking.exception.ExceptionEnum;
 import tracking.web.dto.HitsResponseDto;
 import tracking.web.dto.LogsRequestDto;
 import tracking.web.dto.LogsResponseDto;
@@ -34,7 +36,7 @@ public class TrackingService {
                     .url(url)
                     .build());
         } else {
-            new Exception("이미 등록된 url 입니다.");
+            throw new ApiException(ExceptionEnum.ALREADY_SAVED_URL);
         }
     }
 
@@ -103,6 +105,10 @@ public class TrackingService {
     public HitsResponseDto showHits(String url) {
         Hits hits = hitsRepository.findByUrl(url);
 
+        if (hits == null) {
+            throw new ApiException(ExceptionEnum.URL_NOT_FOUND);
+        }
+
         HitsResponseDto hitsResponseDto = new HitsResponseDto();
         hitsResponseDto.setDailyHits(hits.getDailyHits());
         hitsResponseDto.setTotalHits(hits.getTotalHits());
@@ -120,6 +126,11 @@ public class TrackingService {
         int customDaysHits = 0;
 
         Hits hits = hitsRepository.findByUrl(logsRequestDto.getUrl());
+
+        if (hits == null) {
+            throw new ApiException(ExceptionEnum.URL_NOT_FOUND);
+        }
+
         List<Logs> logsList = logsRepository.findByHitsOrderByDateAsc(hits);
         if (logsList.size() > 0) {
             for (Logs l:
