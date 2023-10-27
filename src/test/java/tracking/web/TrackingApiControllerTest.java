@@ -34,8 +34,8 @@ public class TrackingApiControllerTest {
 
         // when, then
         mvc.perform(MockMvcRequestBuilders
-                        .post("/api/tracking/users/{url}", url)
-                        .characterEncoding("utf-8"))
+                        .post("/api/tracking/hits")
+                        .param("url", url))
                 .andExpect(status().isOk());
     }
 
@@ -47,8 +47,8 @@ public class TrackingApiControllerTest {
 
         // when, then
         mvc.perform(MockMvcRequestBuilders
-                        .put("/api/tracking/hits/{url}", url)
-                        .characterEncoding("utf-8"))
+                        .put("/api/tracking/hits")
+                        .param("url", url))
                 .andExpect(status().isOk());
     }
 
@@ -61,8 +61,8 @@ public class TrackingApiControllerTest {
 
         // when, then
         mvc.perform(MockMvcRequestBuilders
-                        .get("/api/tracking/hits-management/{url}", url)
-                        .characterEncoding("utf-8"))
+                        .get("/api/tracking/hits-management")
+                        .param("url", url))
                 .andExpect(status().isOk());
     }
 
@@ -77,7 +77,6 @@ public class TrackingApiControllerTest {
 
         // when, then
         mvc.perform(MockMvcRequestBuilders.get("/api/tracking/hits-management/statistics")
-                        .characterEncoding("utf-8")
                         .flashAttr("logsRequestDto", dto))
                 .andExpect(status().isOk());
     }
