@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ApiExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
-    public ResponseEntity<ApiExceptionEntity> handleException(ApiException ex) {
+    protected ResponseEntity<ApiExceptionEntity> handleException(ApiException ex) {
         ApiExceptionEntity customResponseEntity = new ApiExceptionEntity();
 
         ExceptionEnum errorCode = ex.getError();
