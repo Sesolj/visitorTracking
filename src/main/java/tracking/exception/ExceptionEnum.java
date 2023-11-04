@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-@AllArgsConstructor
 @Getter
 public enum ExceptionEnum {
     //400 BAD_REQUEST 잘못된 요청
@@ -22,4 +21,9 @@ public enum ExceptionEnum {
 
     private final HttpStatus status;
     private final String message;
+
+    ExceptionEnum(HttpStatus status, String  message) {
+        this.status = status;
+        this.message = message;
+    }
 }
