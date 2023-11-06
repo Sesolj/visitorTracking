@@ -41,7 +41,7 @@ Java, Spring Boot, Gradle, JPA, MySQL, Swagger
 #### 날짜 관련 정보의 처리 방식 통일
 코드의 일관성을 해치는 여러 요인 중 하나는 바로 날짜와 관련된 정보라고 생각합니다. 재직 당시 개발자에 따라 구현 방식이 달라, 데이터를 String으로 받아 형변환 하는 방법, 처음부터 DateTime 형으로 받는 방법이 코드에 혼재되어 있었기 때문입니다.
 
-이를 계기로 날짜 관련 정보에 대한 처리 방식을 고려하게 되었고, 불필요한 형변환 과정을 줄이기 위해 String이 아닌 LocalDateTime 형으로 데이터를 받을 수 있게 했습니다. 이를 위해 DTO에 ```@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")``` 어노테이션을 추가하여 데이터를 직렬화하고, Swagger 사용자의 편의를 위해 ```@Schema``` 어노테이션으로 원하는 날짜 포맷을 hint로써 표기했습니다.
+이를 계기로 날짜 관련 정보에 대한 처리 방식을 고려하게 되었고, 불필요한 형변환 과정을 줄이기 위해 String이 아닌 LocalDateTime 형으로 데이터를 받을 수 있게 했습니다. 이를 위해 DTO에 ```@DateTimeFormat``` 어노테이션을 추가하여 데이터를 직렬화하고, Swagger 사용자의 편의를 위해 ```@Schema``` 어노테이션으로 원하는 날짜 포맷을 hint로써 표기했습니다.
 
 #### 테스트 격리
 @Transactional이 내장되어 있는 @DataJpaTest 어노테이션을 통해 테스트용 데이터를 롤백하는 방식으로 테스트를 수행하였습니다.
@@ -79,11 +79,11 @@ Exception 관리를 위한 별도의 패키지
 원인은 영속성 컨텍스트 때문이었습니다. 단일 update와 다르게 일괄 update 시에는 영속성 컨텍스트를 통해 Entity를 관리하지 못한다는 것을 알게 되었습니다. 따라서 별도로 ```EntityManager```를 주입받은 후 ```flush()```와 ```clear()```를 통해 데이터 반영 후 영속성 컨텍스트를 비우고 다시 조회하는 방법으로 문제를 해결하였습니다. 이를 계기로 JPA의 영속성 컨텍스트 개념과 특징에 대해 배우게 되었습니다.
 
 #### @PathVariable 404 Request Error(Spring Security의 정규화로 인한 문제)
-개발 초기 당시 Rest Api Naming/Design Convention에 유의하여 API를 설계하였습니다. 일환으로, 특정 한 건의 데이터를 조회하는 경우 URI에 파라미터를 표시하도록 Naming하고 컨트롤러는 @PathVariable을 통해 데이터를 전달받았습니다.
+개발 초기 당시 Rest Api Naming/Design Convention에 유의하여 API를 설계하였습니다. 일환으로, 특정 한 건의 데이터를 조회하는 경우 URI에 Parameter를 표시하도록 Naming하고 컨트롤러는 @PathVariable을 통해 데이터를 전달받았습니다.
 
 @RequestParam을 사용하는 것이 익숙했으나 해당 어노테이션은 특정 한 건의 데이터를 조회하기보다 정렬이 필요할 경우 사용하고, 자원의 '식별'이 필요할 경우에는 @PathVariable을 사용한다는 REST API의 가이드라인을 접했기 때문입니다.
 
-하지만 개발 과정에서 @PathVariable로 데이터를 전달받자 404 Requst Error가 발생하였습니다. 원인은 /(slash)였습니다. Parameter로 URL을 받자, 슬래시가 resource 경로로 취급되었기 때문입니다. 이를 통해 Spring Security가 URL을 정규화하고 이중 슬래시를 단일 슬래시로 대체한다는 사실을 알게 되었습니다. 경로 매개 변수에 slash를 인코딩하는 방법이 있지만 잠재적인 Security 위험을 초래할 수 있어 권장되지 않기 때문에, @PathVariable을 쿼리스트링으로 동작하는 @RequestParam으로 변경하여 문제를 해결했습니다. 
+하지만 개발 과정에서 @PathVariable로 데이터를 전달받자 404 Request Error가 발생하였습니다. 원인은 /(slash)였습니다. Parameter로 URL을 받자, 슬래시가 resource 경로로 취급되었기 때문입니다. 이를 통해 Spring Security가 URL을 정규화하고 이중 슬래시를 단일 슬래시로 대체한다는 사실을 알게 되었습니다. 경로 매개 변수에 slash를 인코딩하는 방법이 있지만 잠재적인 Security 위험을 초래할 수 있어 권장되지 않기 때문에, @PathVariable을 쿼리스트링으로 동작하는 @RequestParam으로 변경하여 문제를 해결했습니다. 
 
 
 <br/>
@@ -93,7 +93,7 @@ Exception 관리를 위한 별도의 패키지
 #### CI/CD 파이프라인 구축
 Travis CI를 통해 CI를 구축하고자 했으나, 알 수 없는 이유로 Build 감지가 안되는 오류가 발생하였습니다. 
 
-차선으로 CI tool을 Jenkins로 변경하였고, github와 연동하여 push 발생 시 ./gradlew clean test 명령어를 수행하도록 로컬 환경에 CI를 구축하였습니다.
+차선으로 CI tool을 Jenkins로 변경하였고, github와 연동하여 push 발생 시 /gradlew clean test 명령어를 수행하도록 로컬 환경에 CI를 구축하였습니다.
 이와 같이 현재는 빌드가 되면 github의 webhook 기능을 통해 Jenkins로 trigger를 유발하고 테스트 수행-빌드 과정이 이루어지게끔 되어있습니다.
 
 더 나아가 클라우드 환경에서 지속적 통합/무중단 배포까지 할 수 있도록 CI/CD 파이프라인을 구축하고자 합니다.
