@@ -51,7 +51,7 @@ Java, Spring Boot, Gradle, JPA, MySQL, Swagger
 따라서 이 경우에는 데이터를 전부 삭제시키는 방법으로 DB를 초기화해야 된다는 것을 알게 되었습니다. 이로 인해 별도의 테스트용 DB를 생성해야된다는 점, 또한 모든 Bean을 로드하는 @SpringBootTest의 특성이 가벼운 프로그램에는 맞지 않는다고 생각하여 생산성을 위해 테스트 격리 방식을 변경하였습니다.
 
 #### @ControllerDevice와 커스텀 Enum을 통한 예외 처리
-비즈니스 로직 예외 처리를 위해 개발자가 thorw할 수 있는 예외 처리 방식을 구현하였습니다.
+비즈니스 로직 예외 처리를 위해 개발자가 throw할 수 있는 예외 처리 방식을 구현하였습니다.
 
 예외 발생 시 반환할 Http Status와 메세지를 관리하기 위해 커스텀 Exception Enum과 RuntimeException을 상속받는 Custom Exception을 생성하고, @ControllerAdvice 어노테이션을 통해 다양한 예외를 일관적인 방식으로 처리할 수 있도록 코드를 작성하였습니다.
 ```
@@ -83,7 +83,7 @@ Exception 관리를 위한 별도의 패키지
 
 @RequestParam을 사용하는 것이 익숙했으나 해당 어노테이션은 특정 한 건의 데이터를 조회하기보다 정렬이 필요할 경우 사용하고, 자원의 '식별'이 필요할 경우에는 @PathVariable을 사용한다는 REST API의 가이드라인을 접했기 때문입니다.
 
-하지만 개발 과정에서 @PathVariable로 데이터를 전달받자 404 Request Error가 발생하였습니다. 원인은 /(slash)였습니다. Parameter로 URL을 받자, 슬래시가 resource 경로로 취급되었기 때문입니다. 이를 통해 Spring Security가 URL을 정규화하고 이중 슬래시를 단일 슬래시로 대체한다는 사실을 알게 되었습니다. 경로 매개 변수에 slash를 인코딩하는 방법이 있지만 잠재적인 Security 위험을 초래할 수 있어 권장되지 않기 때문에, @PathVariable을 쿼리스트링으로 동작하는 @RequestParam으로 변경하여 문제를 해결했습니다. 
+하지만 개발 과정에서 @PathVariable로 데이터를 전달받자 404 Request Error가 발생하였습니다. 원인은 /(slash)였습니다. Parameter로 URL을 받자, 슬래시가 resource 경로로 취급되었기 때문입니다. 이를 통해 Spring Security가 URL을 정규화하고 이중 슬래시를 단일 슬래시로 대체한다는 사실을 알게 되었습니다. 경로 매개 변수에 slash를 인코딩하는 방법이 있지만 잠재적인 Security 위험을 초래할 수 있어 권장되지 않기 때문에, @PathVariable을 쿼리스트링으로 동작하는 @RequestParam으로 변경하여 문제를 해결했습니다. 해당 문제를 계기로 클라이언트 요청 데이터 처리 관련 애노테이션들의 차이를 알게 되었으며, 상황에 따라 각 방법을 적절히 사용해야된다는 것을 배울 수 있었습니다.
 
 
 <br/>
